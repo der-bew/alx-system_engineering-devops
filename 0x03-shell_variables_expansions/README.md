@@ -1,0 +1,1 @@
+This folder is created for 0x03-shell_variables_expansions projects
