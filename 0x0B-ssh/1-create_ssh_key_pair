@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Creates an RSA key pair name school, number of bits 4096, passpharase betty
+
+ssh-keygen -t rsa -b 4096 -f school -N betty
