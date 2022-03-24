@@ -2,17 +2,18 @@
 # shellcheck disable=SC2086
 # display information about subdomains
 
-sub_info () {
-    
-    if [ "$#" -eq 2 ]; then
-        dig $2.$1 | grep -A1 'ANSWER SECTION:' | tr '\n' ' ' | awk '{split($0,a," "); split(a[4],b,"."); printf "The subdomain %s is a %s record and points to %s\n",b[1], a[7], a[8]}'
-    elif [ "$#" -eq 1 ]; then
-        dig www.$1 | grep -A1 'ANSWER SECTION:' | tr '\n' ' ' | awk '{split($0,a," "); printf "The subdomain www is a %s record and points to %s\n", a[7], a[8]}'
-        dig lb-01.$1 | grep -A1 'ANSWER SECTION:' | tr '\n' ' ' | awk '{split($0,a," "); printf "The subdomain lb-01 is a %s record and points to %s\n", a[7], a[8]}'
-        dig web-01.$1 | grep -A1 'ANSWER SECTION:' | tr '\n' ' ' | awk '{split($0,a," "); printf "The subdomain web-01 is a %s record and points to %s\n", a[7], a[8]}'
-        dig web-02.$1 | grep -A1 'ANSWER SECTION:' | tr '\n' ' ' | awk '{split($0,a," "); printf "The subdomain web-02 is a %s record and points to %s\n", a[7], a[8]}'
-    fi
-
-}
-
-sub_info $1 $2
+if [ "$#" = 1 ]
+then
+    subdomains=("www" "lb-01" "web-01" "web-02")
+    for sub_domain in "${subdomains[@]}"
+    do
+	record_type=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
+        destination=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
+	echo "The subdomain $sub_domain is a $record_type record and points to $destination"
+    done
+elif [ "$#" = 2 ]
+then
+    record_type=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
+    destination=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
+    echo "The subdomain $2 is a $record_type record and points to $destination"
+fi
