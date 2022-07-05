@@ -1,21 +1,22 @@
 #!/usr/bin/python3
 """
-1. Top Ten
+Contains the top_ten function
 """
+
 import requests
 
 
 def top_ten(subreddit):
-    """ Print the titles of the 10 hot post for a given subreddit """
-    api_url = 'https://www.reddit.com'
-
-    headers = {
-        'user-agent': 'Mozilla/5.0'
-    }
-    res = requests.get(f'{api_url}/r/{subreddit}/hot.json?limit=10',
-                       headers=headers, allow_redirects=False)
-    if res.status_code == 200:
-        for hot in res.json().get('data').get('children'):
-            print(hot.get('data').get('title'))
-    else:
+    """prints the titles of the top ten hot posts for a given subreddit"""
+    if subreddit is None or type(subreddit) is not str:
         print(None)
+    r = requests.get('http://www.reddit.com/r/{}/hot.json'.format(subreddit),
+                     headers={'User-Agent': 'Python/requests:APIproject:\
+                     v1.0.0 (by /u/aaorrico23)'},
+                     params={'limit': 10}).json()
+    posts = r.get('data', {}).get('children', None)
+    if posts is None or (len(posts) > 0 and posts[0].get('kind') != 't3'):
+        print(None)
+    else:
+        for post in posts:
+            print(post.get('data', {}).get('title', None))
